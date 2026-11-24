@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 // The entry: one single-line bio for an AI agent on a dating app.
 // Picked by a blind tournament: 10 candidates, two independent blind judges
@@ -17,3 +17,11 @@ if (LINE.includes("\n")) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", LINE, "utf8");
+
+// Read back what was written and refuse to report success unless the file
+// holds exactly the line — a short write or a trailing newline would fail
+// the gate, so catch it here instead of shipping it.
+const back = readFileSync("/output/entry.txt", "utf8");
+if (back !== LINE) {
+  throw new Error("entry.txt does not match the line exactly");
+}
